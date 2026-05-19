@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>【本草脉案】领取你的专属理疗方</title>
     
-    <link rel="icon" href="logo.png" type="image/png">
-    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" href="logo.png?v=202605" type="image/png">
+    <link rel="apple-touch-icon" href="logo.png?v=202605">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -33,14 +33,12 @@
         .footer-note { margin-top: 15px; font-size: 1.1rem; color: var(--ink-black); border-top: 1px dashed #ccc; padding-top: 12px; font-weight: bold; }
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         #final-img { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 4px; border: 2px solid #fff; }
-        
-        /* 微信抓图专用图标样式：让它极小且透明，不影响视觉 */
         .wechat-icon { position: absolute; top: 0; left: 0; width: 300px; height: 300px; z-index: -1; opacity: 0.01; pointer-events: none; }
     </style>
 </head>
 <body>
 
-<img src="logo.png" class="wechat-icon" alt="wechat-share-icon">
+<img src="logo.png?v=2026" class="wechat-icon">
 
 <div class="paper-texture"></div>
 <div id="app">
@@ -49,35 +47,58 @@
         <p class="subtitle">辨证施策 · 循经寻方<br>让身体回归平衡状态</p>
         <button class="btn" onclick="nextScreen('q1')">开始测一测</button>
     </div>
+
     <div id="screen-q1" class="screen">
         <h3>您当前处于什么状态？</h3>
         <div class="option" onclick="handleFlow('active')">刚刚结束运动（打球/健身等）</div>
         <div class="option" onclick="handleFlow('rest')">享受静谧时光（居家/休息/办公）</div>
     </div>
+
     <div id="screen-qa1" class="screen">
         <h3>运动后的核心体感？</h3>
         <div class="option" onclick="record('feel', 'pain')">肌肉关节酸胀，有僵硬感</div>
         <div class="option" onclick="record('feel', 'heavy')">出汗多，感觉身体沉重乏力</div>
-        <div class="option" onclick="record('feel', 'hot')">燥热难耐，想喝冷饮</div>
-        <div class="option" onclick="record('feel', 'none')">体感平衡，常规恢复</div>
+        <div class="option" onclick="record('feel', 'hot')">燥热难耐，口渴想喝冷饮</div>
+        <div class="option" onclick="record('feel', 'none')">体感平衡，仅需常规恢复</div>
     </div>
+    <div id="screen-qa2" class="screen">
+        <h3>运动后的精神状态？</h3>
+        <div class="option" onclick="record('spirit', 'excited')">大脑兴奋，依然亢奋</div>
+        <div class="option" onclick="record('spirit', 'tired')">极度疲惫，想立刻睡觉</div>
+        <div class="option" onclick="record('spirit', 'none')">精神平和，和往常一样</div>
+    </div>
+
     <div id="screen-qr1" class="screen">
-        <h3>目前的体感状态？</h3>
+        <h3>您平时的体温偏好？</h3>
         <div class="option" onclick="record('temp', 'cold')">怕冷星人，手脚容易冰凉</div>
-        <div class="option" onclick="record('local', 'nuan')">经期冷痛，或小腹常觉微凉</div>
-        <div class="option" onclick="record('local', 'itch')">局部（如足部）易汗瘙痒</div>
-        <div class="option" onclick="record('local', 'heavy')">晨起不清爽，身体沉重</div>
-        <div class="option" onclick="record('local', 'none')">全身轻松，无明显不适</div>
+        <div class="option" onclick="record('temp', 'hot')">怕热体质，易心烦口干</div>
+        <div class="option" onclick="record('temp', 'none')">冷热适应良好</div>
     </div>
+    <div id="screen-qr2" class="screen">
+        <h3>是否有以下特定烦恼？</h3>
+        <div class="option" onclick="record('local', 'nuan')">经期冷痛，或小腹微凉</div>
+        <div class="option" onclick="record('local', 'itch')">局部易汗瘙痒</div>
+        <div class="option" onclick="record('local', 'heavy')">身体沉重如裹</div>
+        <div class="option" onclick="record('local', 'none')">无明显不适</div>
+    </div>
+    <div id="screen-qr3" class="screen">
+        <h3>近期的压力/精神状态？</h3>
+        <div class="option" onclick="record('spirit', 'anxious')">情绪易波动，思虑较多</div>
+        <div class="option" onclick="record('spirit', 'tired')">提不起劲，容易疲倦</div>
+        <div class="option" onclick="record('spirit', 'none')">状态平和</div>
+    </div>
+
     <div id="screen-safety" class="screen">
         <h3>安全提醒：检查脚部皮肤</h3>
         <div class="option" onclick="startDrawing()">皮肤完好，无创口</div>
         <div class="option" onclick="nextScreen('warning')">有红肿、破损或水泡</div>
     </div>
+
     <div id="screen-draw" class="screen">
         <h3>正在封存脉案...</h3>
         <div id="draw-container"><div id="reel" class="reel"></div></div>
     </div>
+
     <div id="screen-result" class="screen">
         <div id="report-card">
             <h2 style="color:var(--clay-red); margin-top:0;">理疗脉案</h2>
@@ -88,17 +109,21 @@
         </div>
         <button class="btn" style="margin-top:20px;" onclick="generatePoster()">保存脉案海报</button>
     </div>
+
     <div id="screen-warning" class="screen">
         <h1>⚠ 暂不建议使用</h1>
         <p class="subtitle">受损皮肤不宜浸泡。<br>请等愈合后再试。</p>
         <button class="btn" onclick="location.reload()">重新开始</button>
     </div>
 </div>
+
 <div id="overlay" class="overlay" onclick="this.style.display='none'">
     <img id="final-img" src="">
     <p style="color:white; margin-top:15px;">↑ 长按图片保存，发送给六一领奖</p>
 </div>
+
 <script>
+    const ver = "?v=" + new Date().getTime(); 
     const config = {
         'huoxue': { img: 'huoxue.png', name: '活血通络' },
         'qushi': { img: 'qushi.png', name: '祛湿健脾' },
@@ -111,23 +136,49 @@
     };
     let userAnswers = {};
     let currentFlow = '';
-    function nextScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('screen-' + id).classList.add('active'); }
-    function handleFlow(type) { currentFlow = type; userAnswers['scene'] = type; if(type === 'active') nextScreen('qa1'); else nextScreen('qr1'); }
-    function record(key, val) { userAnswers[key] = val; nextScreen('safety'); }
+
+    function nextScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + id).classList.add('active');
+    }
+
+    function handleFlow(type) {
+        currentFlow = type;
+        userAnswers['scene'] = type;
+        if(type === 'active') nextScreen('qa1');
+        else nextScreen('qr1');
+    }
+
+    function record(key, val) {
+        userAnswers[key] = val;
+        const cur = document.querySelector('.screen.active').id;
+        if(currentFlow === 'active'){
+            if(cur === 'screen-qa1') nextScreen('qa2');
+            else nextScreen('safety');
+        } else {
+            if(cur === 'screen-qr1') nextScreen('qr2');
+            else if(cur === 'screen-qr2') nextScreen('qr3');
+            else nextScreen('safety');
+        }
+    }
+
     function calculateResult() {
-        const { scene, feel, temp, local } = userAnswers;
+        const { scene, feel, spirit, temp, local } = userAnswers;
         if (scene === 'active') {
             if (feel === 'pain') return 'huoxue';
             if (feel === 'heavy') return 'qushi';
             if (feel === 'hot') return 'jieshu';
+            if (spirit === 'excited') return 'jieyu';
             return 'huoxue';
         }
         if (local === 'nuan') return 'nuangong';
         if (local === 'itch') return 'zhiyang';
         if (temp === 'cold') return 'quhan';
-        if (local === 'heavy') return 'qushi';
+        if (spirit === 'anxious') return 'jieyu';
+        if (local === 'heavy' || temp === 'hot') return 'qushi';
         return 'aicao';
     }
+
     function startDrawing() {
         const finalKey = calculateResult();
         nextScreen('draw');
@@ -138,8 +189,12 @@
         html += `<div class="card" style="border-color:var(--clay-red); color:var(--clay-red)">${config[finalKey].name}</div>`;
         reel.innerHTML = html;
         setTimeout(() => reel.style.transform = `translateX(-${30 * 116}px)`, 100);
-        setTimeout(() => { document.getElementById('res-img').src = config[finalKey].img; nextScreen('result'); }, 3800);
+        setTimeout(() => {
+            document.getElementById('res-img').src = config[finalKey].img + ver;
+            nextScreen('result');
+        }, 3800);
     }
+
     function generatePoster() {
         const card = document.getElementById('report-card');
         html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
