@@ -33,10 +33,15 @@
         .footer-note { margin-top: 15px; font-size: 1.1rem; color: var(--ink-black); border-top: 1px dashed #ccc; padding-top: 12px; font-weight: bold; }
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         #final-img { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 4px; border: 2px solid #fff; }
+        
+        /* 微信抓图专用图标样式：让它极小且透明，不影响视觉 */
+        .wechat-icon { position: absolute; top: 0; left: 0; width: 300px; height: 300px; z-index: -1; opacity: 0.01; pointer-events: none; }
     </style>
 </head>
 <body>
-<div style="display:none;"><img src="logo.png"></div>
+
+<img src="logo.png" class="wechat-icon" alt="wechat-share-icon">
+
 <div class="paper-texture"></div>
 <div id="app">
     <div id="screen-home" class="screen active">
@@ -53,7 +58,16 @@
         <h3>运动后的核心体感？</h3>
         <div class="option" onclick="record('feel', 'pain')">肌肉关节酸胀，有僵硬感</div>
         <div class="option" onclick="record('feel', 'heavy')">出汗多，感觉身体沉重乏力</div>
-        <div class="option" onclick="record('feel', 'hot')">燥热难耐，口渴想喝冰饮</div>
+        <div class="option" onclick="record('feel', 'hot')">燥热难耐，想喝冷饮</div>
+        <div class="option" onclick="record('feel', 'none')">体感平衡，常规恢复</div>
+    </div>
+    <div id="screen-qr1" class="screen">
+        <h3>目前的体感状态？</h3>
+        <div class="option" onclick="record('temp', 'cold')">怕冷星人，手脚容易冰凉</div>
+        <div class="option" onclick="record('local', 'nuan')">经期冷痛，或小腹常觉微凉</div>
+        <div class="option" onclick="record('local', 'itch')">局部（如足部）易汗瘙痒</div>
+        <div class="option" onclick="record('local', 'heavy')">晨起不清爽，身体沉重</div>
+        <div class="option" onclick="record('local', 'none')">全身轻松，无明显不适</div>
     </div>
     <div id="screen-safety" class="screen">
         <h3>安全提醒：检查脚部皮肤</h3>
@@ -73,6 +87,11 @@
             <div class="footer-note">凭此脉案向“六一”领取对应补给包</div>
         </div>
         <button class="btn" style="margin-top:20px;" onclick="generatePoster()">保存脉案海报</button>
+    </div>
+    <div id="screen-warning" class="screen">
+        <h1>⚠ 暂不建议使用</h1>
+        <p class="subtitle">受损皮肤不宜浸泡。<br>请等愈合后再试。</p>
+        <button class="btn" onclick="location.reload()">重新开始</button>
     </div>
 </div>
 <div id="overlay" class="overlay" onclick="this.style.display='none'">
@@ -96,10 +115,18 @@
     function handleFlow(type) { currentFlow = type; userAnswers['scene'] = type; if(type === 'active') nextScreen('qa1'); else nextScreen('qr1'); }
     function record(key, val) { userAnswers[key] = val; nextScreen('safety'); }
     function calculateResult() {
-        const { scene, feel } = userAnswers;
-        if (scene === 'active' && feel === 'pain') return 'huoxue';
-        if (feel === 'heavy') return 'qushi';
-        return 'aicaoqingshu';
+        const { scene, feel, temp, local } = userAnswers;
+        if (scene === 'active') {
+            if (feel === 'pain') return 'huoxue';
+            if (feel === 'heavy') return 'qushi';
+            if (feel === 'hot') return 'jieshu';
+            return 'huoxue';
+        }
+        if (local === 'nuan') return 'nuangong';
+        if (local === 'itch') return 'zhiyang';
+        if (temp === 'cold') return 'quhan';
+        if (local === 'heavy') return 'qushi';
+        return 'aicao';
     }
     function startDrawing() {
         const finalKey = calculateResult();
