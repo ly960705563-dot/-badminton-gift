@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>赛后回血：本草理疗补给</title>
+    <title>本草理疗评估：领取你的专属补给</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
@@ -14,7 +14,6 @@
             --ink-black: #1A1A1A;
             --jade-green: #4F7942;
             --clay-red: #A52A2A;
-            --paper-shadow: rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -53,7 +52,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h1 { font-size: 2rem; margin-bottom: 10px; color: var(--clay-red); font-weight: 700; letter-spacing: 2px; }
+        h1 { font-size: 1.8rem; margin-bottom: 10px; color: var(--clay-red); font-weight: 700; letter-spacing: 2px; }
         .subtitle { font-size: 1rem; color: #555; margin-bottom: 30px; line-height: 1.6; }
 
         .btn {
@@ -63,68 +62,53 @@
             cursor: pointer; transition: all 0.3s; font-family: inherit;
         }
 
-        .btn:active { transform: scale(0.95); }
-
         .option {
             background: white; margin-bottom: 12px; padding: 16px;
             border-radius: 10px; border: 1px solid #ddd;
             width: 100%; text-align: left; font-size: 1rem;
+            transition: all 0.2s;
         }
-        .option:active { background: #f9f9f9; border-color: var(--jade-green); }
+        .option:active { background: #f0f0f0; border-color: var(--jade-green); }
 
         /* 抽卡区 */
         #draw-container {
-            width: 100%; height: 220px; position: relative;
+            width: 100%; height: 200px; position: relative;
             overflow: hidden; margin: 20px 0; display: flex; align-items: center;
         }
         .reel { display: flex; position: absolute; left: 50%; transition: transform 3.5s cubic-bezier(0.15, 0, 0.15, 1); }
         .card {
-            width: 110px; height: 160px; background: white; margin: 0 8px;
-            flex-shrink: 0; border: 3px solid #333; border-radius: 6px;
+            width: 100px; height: 140px; background: white; margin: 0 8px;
+            flex-shrink: 0; border: 2px solid #333; border-radius: 6px;
             display: flex; justify-content: center; align-items: center;
             font-weight: bold; writing-mode: vertical-rl; letter-spacing: 4px;
+            font-size: 0.9rem;
         }
 
-        /* 结果卡片 - 针对3:4图片优化 */
+        /* 结果展示 */
         #report-card {
             background-color: #fff; padding: 20px; width: 100%;
-            border: 1px solid #ccc; position: relative;
-            text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border: 1px solid #eee; position: relative;
+            text-align: center;
         }
-
-        .presc-title { font-size: 1.6rem; font-weight: bold; color: var(--clay-red); margin-bottom: 15px; }
-
-        /* 核心修改：预留3:4比例空间，确保图片完整显示 */
         .img-container {
-            width: 100%;
-            aspect-ratio: 3 / 4; /* 强制比例 */
-            background-color: #f9f9f9;
-            margin-bottom: 15px;
+            width: 100%; aspect-ratio: 3 / 4;
+            background-color: #fcfcfc; margin-bottom: 15px;
+            display: flex; justify-content: center; align-items: center;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
-
-        .report-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* 确保3:4图片完整显示不被裁切 */
-        }
-
+        .report-img { width: 100%; height: 100%; object-fit: contain; }
         .footer-note {
-            margin-top: 15px; font-size: 0.95rem; color: #333;
-            border-top: 1px dashed #ccc; padding-top: 12px;
-            font-weight: bold;
+            margin-top: 15px; font-size: 1rem; color: var(--ink-black);
+            border-top: 1px dashed #ccc; padding-top: 12px; font-weight: bold;
         }
 
         .overlay {
             position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.9); z-index: 2000;
+            background: rgba(0,0,0,0.95); z-index: 2000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
             padding: 20px;
         }
-        #final-img { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 4px; }
+        #final-img { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 4px; border: 2px solid #fff;}
     </style>
 </head>
 <body>
@@ -132,31 +116,57 @@
 <div class="paper-texture"></div>
 
 <div id="app">
+    <!-- 首页 -->
     <div id="screen-home" class="screen active">
-        <h1>赛后本草理疗</h1>
-        <p class="subtitle">根据今日球局体感<br>匹配你的专属恢复方案</p>
-        <button class="btn" onclick="nextScreen('q1')">开始评估</button>
+        <h1>本草理疗评估</h1>
+        <p class="subtitle">无论是汗水淋漓，还是静谧午后<br>身体都值得一份本草的呵护</p>
+        <button class="btn" onclick="nextScreen('q0')">开启评估</button>
     </div>
 
-    <div id="screen-q1" class="screen">
-        <h3>Q1：今日球局体感？</h3>
-        <div class="option" onclick="handleSelect('q1', 'A')">拉吊较多，双腿酸胀感明显</div>
-        <div class="option" onclick="handleSelect('q1', 'B')">大汗淋漓，感觉身体沉重</div>
-        <div class="option" onclick="handleSelect('q1', 'C')">激战后大脑仍处于兴奋状态</div>
-        <div class="option" onclick="handleSelect('q1', 'D')">场馆寒冷，手脚至今冰凉</div>
-        <div class="option" onclick="handleSelect('q1', 'E')">汗多且足部有瘙痒感</div>
+    <!-- Q0: 状态筛选 -->
+    <div id="screen-q0" class="screen">
+        <h3>您当下的状态是？</h3>
+        <div class="option" onclick="handleFlow('active')">刚刚结束运动 (打球/健身等)</div>
+        <div class="option" onclick="handleFlow('rest')">享受静谧时光 (居家/办公等)</div>
     </div>
 
+    <!-- Q1-Active: 运动感受 -->
+    <div id="screen-q1a" class="screen">
+        <h3>运动后的核心感受？</h3>
+        <div class="option" onclick="handleSelect('huoxue')">双腿沉重，肌肉酸胀紧绷</div>
+        <div class="option" onclick="handleSelect('qushi')">大汗之后，感觉身体湿沉疲惫</div>
+        <div class="option" onclick="handleSelect('jieyu')">精神亢奋，甚至有些难以入眠</div>
+        <div class="option" onclick="handleSelect('quhan')">场馆寒冷，即便动完仍手脚凉</div>
+    </div>
+
+    <!-- Q1-Rest: 体质倾向 -->
+    <div id="screen-q1r" class="screen">
+        <h3>日常最想改善的状态？</h3>
+        <div class="option" onclick="handleSelect('nuangong')">经期前后，小腹冷痛或不适</div>
+        <div class="option" onclick="handleSelect('zhiyang')">足部多汗，伴随细微瘙痒</div>
+        <div class="option" onclick="handleSelect('jieshu')">内心烦躁，感觉身体内热重</div>
+        <div class="option" onclick="handleSelect('aicao')">长期空调房，体表微凉没精神</div>
+    </div>
+
+    <!-- 安全检查 -->
+    <div id="screen-safety" class="screen">
+        <h3>安全提醒：皮肤状态？</h3>
+        <div class="option" onclick="startDrawing()">皮肤完好</div>
+        <div class="option" onclick="nextScreen('warning')">有破损、红肿或水泡</div>
+    </div>
+
+    <!-- 抽卡页 -->
     <div id="screen-draw" class="screen">
-        <h3>正在封存脉案...</h3>
+        <h3>正在寻方封存...</h3>
         <div id="draw-container">
             <div id="reel" class="reel"></div>
         </div>
     </div>
 
+    <!-- 结果页 -->
     <div id="screen-result" class="screen">
         <div id="report-card">
-            <div class="presc-title">赛后本草理疗脉案</div>
+            <h2 style="color:var(--clay-red); margin-top:0;">理疗脉案</h2>
             <div class="img-container">
                 <img id="res-img" src="" class="report-img">
             </div>
@@ -165,6 +175,13 @@
             </div>
         </div>
         <button class="btn" style="margin-top:20px;" onclick="generatePoster()">封存并保存海报</button>
+    </div>
+
+    <!-- 警告 -->
+    <div id="screen-warning" class="screen">
+        <h1>⚠ 暂不建议使用</h1>
+        <p class="subtitle">皮肤受损时不建议药物浸泡。<br>请先用温水清洁，待愈合后再试。</p>
+        <button class="btn" onclick="location.reload()">重新评估</button>
     </div>
 </div>
 
@@ -175,11 +192,14 @@
 
 <script>
     const config = {
-        'huoxue': { img: 'huoxue.png', name: '活血通络包' },
-        'qushi': { img: 'qushi.png', name: '祛湿健脾包' },
-        'jieyu': { img: 'jieyu.png', name: '解郁舒心包' },
-        'quhan': { img: 'quhan.png', name: '暖身驱寒包' },
-        'zhiyang': { img: 'zhiyang.png', name: '杀虫止痒包' }
+        'huoxue': { img: 'huoxue.png', name: '活血通络' },
+        'qushi': { img: 'qushi.png', name: '祛湿健脾' },
+        'jieyu': { img: 'jieyu.png', name: '解郁舒心' },
+        'quhan': { img: 'quhan.png', name: '暖身驱寒' },
+        'nuangong': { img: 'nuangong.png', name: '暖宫调经' },
+        'zhiyang': { img: 'zhiyang.png', name: '杀虫止痒' },
+        'jieshu': { img: 'jieshu.png', name: '清凉解暑' },
+        'aicao': { img: 'aicaoqingshu.png', name: '艾草清暑' }
     };
 
     let finalKey = '';
@@ -189,14 +209,14 @@
         document.getElementById('screen-' + id).classList.add('active');
     }
 
-    function handleSelect(q, val) {
-        if (val === 'A') finalKey = 'huoxue';
-        else if (val === 'B') finalKey = 'qushi';
-        else if (val === 'C') finalKey = 'jieyu';
-        else if (val === 'D') finalKey = 'quhan';
-        else finalKey = 'zhiyang';
-        
-        startDrawing();
+    function handleFlow(type) {
+        if (type === 'active') nextScreen('q1a');
+        else nextScreen('q1r');
+    }
+
+    function handleSelect(key) {
+        finalKey = key;
+        nextScreen('safety');
     }
 
     function startDrawing() {
@@ -208,7 +228,6 @@
             let k = keys[i % keys.length];
             html += `<div class="card">${config[k].name}</div>`;
         }
-        // 目标结果
         html += `<div class="card" style="border-color:var(--clay-red); color:var(--clay-red)">${config[finalKey].name}</div>`;
         for(let i=0; i<5; i++) {
             let k = keys[i % keys.length];
@@ -217,7 +236,7 @@
         reel.innerHTML = html;
 
         setTimeout(() => {
-            reel.style.transform = `translateX(-${40 * 126}px)`;
+            reel.style.transform = `translateX(-${40 * 116}px)`;
         }, 100);
 
         setTimeout(() => {
@@ -229,9 +248,10 @@
     function generatePoster() {
         const card = document.getElementById('report-card');
         html2canvas(card, {
-            scale: 2,
+            scale: 3, // 提升清晰度，解决模糊问题
             useCORS: true,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#ffffff',
+            logging: false
         }).then(canvas => {
             document.getElementById('final-img').src = canvas.toDataURL("image/png");
             document.getElementById('overlay').style.display = 'flex';
