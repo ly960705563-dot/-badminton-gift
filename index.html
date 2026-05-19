@@ -4,7 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>本草理疗评估：领取你的专属补给</title>
+    
+    <!-- 分享元数据 -->
+    <title>【本草脉案】送给你的赛后调理方</title>
+    <meta name="description" content="辨证施策，领取你的专属本草补给包。">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
@@ -14,7 +18,6 @@
             --ink-black: #1A1A1A;
             --jade-green: #4F7942;
             --clay-red: #A52A2A;
-            --paper-shadow: rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -63,8 +66,6 @@
             cursor: pointer; transition: all 0.3s; font-family: inherit;
         }
 
-        .btn:active { transform: scale(0.95); }
-
         .option {
             background: white; margin-bottom: 12px; padding: 16px;
             border-radius: 10px; border: 1px solid #ddd;
@@ -73,7 +74,6 @@
         }
         .option:active { background: #f0f0f0; border-color: var(--jade-green); }
 
-        /* 抽卡区 */
         #draw-container {
             width: 100%; height: 200px; position: relative;
             overflow: hidden; margin: 20px 0; display: flex; align-items: center;
@@ -87,7 +87,6 @@
             font-size: 0.9rem;
         }
 
-        /* 结果展示区 */
         #report-card {
             background-color: #fff; padding: 20px; width: 100%;
             border: 1px solid #eee; position: relative;
@@ -95,26 +94,17 @@
         }
 
         .img-container {
-            width: 100%;
-            aspect-ratio: 3 / 4;
-            background-color: #fcfcfc;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            width: 100%; aspect-ratio: 3 / 4;
+            background-color: #fcfcfc; margin-bottom: 15px;
+            display: flex; justify-content: center; align-items: center;
             overflow: hidden;
         }
 
-        .report-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
+        .report-img { width: 100%; height: 100%; object-fit: contain; }
 
         .footer-note {
             margin-top: 15px; font-size: 1.1rem; color: var(--ink-black);
-            border-top: 1px dashed #ccc; padding-top: 12px;
-            font-weight: bold;
+            border-top: 1px dashed #ccc; padding-top: 12px; font-weight: bold;
         }
 
         .overlay {
@@ -131,21 +121,18 @@
 <div class="paper-texture"></div>
 
 <div id="app">
-    <!-- 首页 -->
     <div id="screen-home" class="screen active">
         <h1>本草理疗评估</h1>
         <p class="subtitle">辨证施策 · 循经寻方<br>让身体回归平衡状态</p>
         <button class="btn" onclick="nextScreen('q1')">开始测一测</button>
     </div>
 
-    <!-- Q1: 场景定义 -->
     <div id="screen-q1" class="screen">
         <h3>当前处于什么状态？</h3>
         <div class="option" onclick="record('scene', 'active')">刚刚结束运动（打球/健身等）</div>
         <div class="option" onclick="record('scene', 'rest')">日常状态（居家/办公/休息）</div>
     </div>
 
-    <!-- Q2: 寒热辨证 -->
     <div id="screen-q2" class="screen">
         <h3>最近对冷热的感受？</h3>
         <div class="option" onclick="record('temp', 'cold')">比较怕冷，手脚容易冰凉</div>
@@ -153,7 +140,6 @@
         <div class="option" onclick="record('temp', 'none')">没啥特别感觉，冷热都能适应</div>
     </div>
 
-    <!-- Q3: 精神状态 -->
     <div id="screen-q3" class="screen">
         <h3>最近的精神和睡眠？</h3>
         <div class="option" onclick="record('spirit', 'tired')">容易疲倦，感觉身体动力不足</div>
@@ -161,7 +147,6 @@
         <div class="option" onclick="record('spirit', 'none')">挺正常的，不怎么关注这些</div>
     </div>
 
-    <!-- Q4: 局部体感 -->
     <div id="screen-q4" class="screen">
         <h3>身体有没有以下细微不适？</h3>
         <div class="option" onclick="record('local', 'pain')">肌肉关节酸胀、僵硬不灵活</div>
@@ -169,36 +154,28 @@
         <div class="option" onclick="record('local', 'none')">全身轻松，没觉得哪里不舒服</div>
     </div>
 
-    <!-- 安全检查 -->
     <div id="screen-safety" class="screen">
         <h3>安全提醒：皮肤状态？</h3>
         <div class="option" onclick="startDrawing()">皮肤完好</div>
         <div class="option" onclick="nextScreen('warning')">有破损、红肿或伤口</div>
     </div>
 
-    <!-- 抽卡页 -->
     <div id="screen-draw" class="screen">
         <h3>正在寻方封存...</h3>
-        <div id="draw-container">
-            <div id="reel" class="reel"></div>
-        </div>
+        <div id="draw-container"><div id="reel" class="reel"></div></div>
     </div>
 
-    <!-- 结果页 -->
     <div id="screen-result" class="screen">
         <div id="report-card">
             <h2 style="color:var(--clay-red); margin-top:0;">理疗脉案</h2>
             <div class="img-container">
                 <img id="res-img" src="" class="report-img">
             </div>
-            <div class="footer-note">
-                凭此脉案向“六一”领取对应补给包
-            </div>
+            <div class="footer-note">凭此脉案向“六一”领取对应补给包</div>
         </div>
         <button class="btn" style="margin-top:20px;" onclick="generatePoster()">保存脉案海报</button>
     </div>
 
-    <!-- 警告 -->
     <div id="screen-warning" class="screen">
         <h1>⚠ 暂不建议使用</h1>
         <p class="subtitle">皮肤受损时不建议药物浸泡。<br>请温水清洁，待愈合后再试。</p>
@@ -242,26 +219,19 @@
 
     function calculateResult() {
         const { scene, temp, spirit, local } = userAnswers;
-        
-        // 优先逻辑：显著体感判定
         if (temp === 'cold') return 'quhan';
         if (spirit === 'excited') return 'jieyu';
         if (local === 'heavy' || temp === 'hot') return 'qushi';
         if (scene === 'active' && local === 'pain') return 'huoxue';
-        
-        // 中立逻辑：如果大部分选没感觉
         if (temp === 'none' && spirit === 'none' && local === 'none') {
             return scene === 'active' ? 'huoxue' : 'aicao';
         }
-
-        // 默认保底
         return 'huoxue';
     }
 
     function startDrawing() {
         finalKey = calculateResult();
         nextScreen('draw');
-        
         const reel = document.getElementById('reel');
         const keys = Object.keys(config);
         let html = '';
@@ -269,18 +239,13 @@
             let k = keys[i % keys.length];
             html += `<div class="card">${config[k].name}</div>`;
         }
-        // 目标结果
         html += `<div class="card" style="border-color:var(--clay-red); color:var(--clay-red)">${config[finalKey].name}</div>`;
         for(let i=0; i<5; i++) {
             let k = keys[i % keys.length];
             html += `<div class="card">${config[k].name}</div>`;
         }
         reel.innerHTML = html;
-
-        setTimeout(() => {
-            reel.style.transform = `translateX(-${40 * 116}px)`;
-        }, 100);
-
+        setTimeout(() => reel.style.transform = `translateX(-${40 * 116}px)`, 100);
         setTimeout(() => {
             document.getElementById('res-img').src = config[finalKey].img;
             nextScreen('result');
@@ -290,10 +255,9 @@
     function generatePoster() {
         const card = document.getElementById('report-card');
         html2canvas(card, {
-            scale: 3, // 高清3倍采样
+            scale: 3,
             useCORS: true,
-            backgroundColor: '#ffffff',
-            logging: false
+            backgroundColor: '#ffffff'
         }).then(canvas => {
             document.getElementById('final-img').src = canvas.toDataURL("image/png");
             document.getElementById('overlay').style.display = 'flex';
