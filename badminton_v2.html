@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>赛后回血：本草理疗补给</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+
+        :root {
+            --bg-color: #F7EEDD;
+            --ink-black: #1A1A1A;
+            --jade-green: #4F7942;
+            --clay-red: #A52A2A;
+            --paper-shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Noto Serif SC', serif;
+            background-color: var(--bg-color);
+            color: var(--ink-black);
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .paper-texture {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/parchment.png');
+            pointer-events: none; opacity: 0.5; z-index: 999;
+        }
+
+        #app {
+            max-width: 500px; margin: 0 auto;
+            height: 100vh; display: flex; flex-direction: column;
+            position: relative; z-index: 1;
+        }
+
+        .screen {
+            display: none; flex: 1; padding: 30px 20px;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; animation: fadeIn 0.4s ease;
+        }
+
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 2rem; margin-bottom: 10px; color: var(--clay-red); font-weight: 700; letter-spacing: 2px; }
+        .subtitle { font-size: 1rem; color: #555; margin-bottom: 30px; line-height: 1.6; }
+
+        .btn {
+            background-color: var(--jade-green); color: white;
+            padding: 15px 40px; border-radius: 30px; border: none;
+            font-size: 1.1rem; box-shadow: 0 4px 15px rgba(79, 121, 66, 0.3);
+            cursor: pointer; transition: all 0.3s; font-family: inherit;
+        }
+
+        .btn:active { transform: scale(0.95); }
+
+        .option {
+            background: white; margin-bottom: 12px; padding: 16px;
+            border-radius: 10px; border: 1px solid #ddd;
+            width: 100%; text-align: left; font-size: 1rem;
+        }
+        .option:active { background: #f9f9f9; border-color: var(--jade-green); }
+
+        /* 抽卡区 */
+        #draw-container {
+            width: 100%; height: 220px; position: relative;
+            overflow: hidden; margin: 20px 0; display: flex; align-items: center;
+        }
+        .reel { display: flex; position: absolute; left: 50%; transition: transform 3.5s cubic-bezier(0.15, 0, 0.15, 1); }
+        .card {
+            width: 110px; height: 160px; background: white; margin: 0 8px;
+            flex-shrink: 0; border: 3px solid #333; border-radius: 6px;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; writing-mode: vertical-rl; letter-spacing: 4px;
+        }
+
+        /* 结果卡片 - 针对3:4图片优化 */
+        #report-card {
+            background-color: #fff; padding: 20px; width: 100%;
+            border: 1px solid #ccc; position: relative;
+            text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .presc-title { font-size: 1.6rem; font-weight: bold; color: var(--clay-red); margin-bottom: 15px; }
+
+        /* 核心修改：预留3:4比例空间，确保图片完整显示 */
+        .img-container {
+            width: 100%;
+            aspect-ratio: 3 / 4; /* 强制比例 */
+            background-color: #f9f9f9;
+            margin-bottom: 15px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .report-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 确保3:4图片完整显示不被裁切 */
+        }
+
+        .footer-note {
+            margin-top: 15px; font-size: 0.95rem; color: #333;
+            border-top: 1px dashed #ccc; padding-top: 12px;
+            font-weight: bold;
+        }
+
+        .overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        #final-img { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="paper-texture"></div>
+
+<div id="app">
+    <div id="screen-home" class="screen active">
+        <h1>赛后本草理疗</h1>
+        <p class="subtitle">根据今日球局体感<br>匹配你的专属恢复方案</p>
+        <button class="btn" onclick="nextScreen('q1')">开始评估</button>
+    </div>
+
+    <div id="screen-q1" class="screen">
+        <h3>Q1：今日球局体感？</h3>
+        <div class="option" onclick="handleSelect('q1', 'A')">拉吊较多，双腿酸胀感明显</div>
+        <div class="option" onclick="handleSelect('q1', 'B')">大汗淋漓，感觉身体沉重</div>
+        <div class="option" onclick="handleSelect('q1', 'C')">激战后大脑仍处于兴奋状态</div>
+        <div class="option" onclick="handleSelect('q1', 'D')">场馆寒冷，手脚至今冰凉</div>
+        <div class="option" onclick="handleSelect('q1', 'E')">汗多且足部有瘙痒感</div>
+    </div>
+
+    <div id="screen-draw" class="screen">
+        <h3>正在封存脉案...</h3>
+        <div id="draw-container">
+            <div id="reel" class="reel"></div>
+        </div>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <div id="report-card">
+            <div class="presc-title">赛后本草理疗脉案</div>
+            <div class="img-container">
+                <img id="res-img" src="" class="report-img">
+            </div>
+            <div class="footer-note">
+                凭此脉案向“六一”领取对应补给包
+            </div>
+        </div>
+        <button class="btn" style="margin-top:20px;" onclick="generatePoster()">封存并保存海报</button>
+    </div>
+</div>
+
+<div id="overlay" class="overlay" onclick="this.style.display='none'">
+    <img id="final-img" src="">
+    <p style="color:white; margin-top:15px;">↑ 长按图片保存，发送给六一领奖</p>
+</div>
+
+<script>
+    const config = {
+        'huoxue': { img: 'huoxue.png', name: '活血通络包' },
+        'qushi': { img: 'qushi.png', name: '祛湿健脾包' },
+        'jieyu': { img: 'jieyu.png', name: '解郁舒心包' },
+        'quhan': { img: 'quhan.png', name: '暖身驱寒包' },
+        'zhiyang': { img: 'zhiyang.png', name: '杀虫止痒包' }
+    };
+
+    let finalKey = '';
+
+    function nextScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + id).classList.add('active');
+    }
+
+    function handleSelect(q, val) {
+        if (val === 'A') finalKey = 'huoxue';
+        else if (val === 'B') finalKey = 'qushi';
+        else if (val === 'C') finalKey = 'jieyu';
+        else if (val === 'D') finalKey = 'quhan';
+        else finalKey = 'zhiyang';
+        
+        startDrawing();
+    }
+
+    function startDrawing() {
+        nextScreen('draw');
+        const reel = document.getElementById('reel');
+        const keys = Object.keys(config);
+        let html = '';
+        for(let i=0; i<40; i++) {
+            let k = keys[i % keys.length];
+            html += `<div class="card">${config[k].name}</div>`;
+        }
+        // 目标结果
+        html += `<div class="card" style="border-color:var(--clay-red); color:var(--clay-red)">${config[finalKey].name}</div>`;
+        for(let i=0; i<5; i++) {
+            let k = keys[i % keys.length];
+            html += `<div class="card">${config[k].name}</div>`;
+        }
+        reel.innerHTML = html;
+
+        setTimeout(() => {
+            reel.style.transform = `translateX(-${40 * 126}px)`;
+        }, 100);
+
+        setTimeout(() => {
+            document.getElementById('res-img').src = config[finalKey].img;
+            nextScreen('result');
+        }, 3800);
+    }
+
+    function generatePoster() {
+        const card = document.getElementById('report-card');
+        html2canvas(card, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            document.getElementById('final-img').src = canvas.toDataURL("image/png");
+            document.getElementById('overlay').style.display = 'flex';
+        });
+    }
+</script>
+</body>
+</html>
